@@ -154,14 +154,6 @@
     width:22px;
     padding:6px 2px;
   }
-  table.sheet td.swatch-cell{width:34px;padding:6px;}
-  table.sheet td.swatch-cell input[type=color]{
-    width:26px;height:26px;
-    border:none;
-    padding:0;
-    border-radius:6px;
-    background:none;
-  }
   table.sheet td input, table.sheet td select{
     width:100%;
     border:none;
@@ -173,7 +165,7 @@
   }
   table.sheet td.col-name input{text-align:left;}
   table.sheet td input:focus, table.sheet td select:focus{outline:none;background:#eaf7f2;}
-  table.sheet tbody tr:nth-child(even) td:not(.sl):not(.swatch-cell){background:#fbfdfc;}
+  table.sheet tbody tr:nth-child(even) td:not(.sl){background:#fbfdfc;}
 
   .del-cell{width:24px;background:#fff;}
   .del-btn{
@@ -235,7 +227,7 @@
 
 <header>
   <h1>🎨 কালার রিকুয়েস্ট</h1>
-  <p>স্ক্রিন প্রিন্ট কালার অর্ডার — সহজ, রঙিন, স্টাইলিশ</p>
+  <p>Developed by Hridoy</p>
 </header>
 
 <div class="container">
@@ -272,7 +264,6 @@
         <thead>
           <tr>
             <th style="width:22px;">নং</th>
-            <th style="width:30px;">রঙ</th>
             <th style="text-align:left;">কালারের নাম</th>
             <th style="width:55px;">পরিমাণ</th>
             <th style="width:60px;">একক</th>
@@ -309,7 +300,6 @@ function addColorRow(name='', hex='#12a37f'){
   const tr = document.createElement('tr');
   tr.innerHTML = `
     <td class="sl">${colorRowCount}</td>
-    <td class="swatch-cell"><input type="color" value="${hex}"></td>
     <td class="col-name"><input type="text" placeholder="কালারের নাম" value="${name}"></td>
     <td><input type="number" step="any" placeholder="0" oninput="calcTotals()"></td>
     <td>
@@ -346,7 +336,7 @@ function calcTotals(){
   const box = document.getElementById('totalsBox');
   const keys = Object.keys(totalsByUnit).filter(u => totalsByUnit[u] > 0);
   if(keys.length===0){
-    box.innerHTML = '<div class="empty-note">এখনো কোনো পরিমাণ যোগ করা হয়নি</div>';
+    box.innerHTML = '';
     return;
   }
   box.innerHTML = keys.map(u =>
@@ -363,14 +353,11 @@ function downloadColorPDF(){
 
   const rowEls = document.querySelectorAll('#colorRows tr');
   const rows = [];
-  const hexList = [];
   rowEls.forEach((r,i)=>{
-    const colorInput = r.querySelector('input[type=color]');
     const nameInput = r.querySelector('.col-name input');
     const qtyInput = r.querySelector('input[type=number]');
     const unitSelect = r.querySelector('select');
-    hexList.push(colorInput.value);
-    rows.push(['', nameInput.value || '-', qtyInput.value || '0', unitSelect.value]);
+    rows.push([nameInput.value || '-', qtyInput.value || '0', unitSelect.value]);
   });
 
   if(rows.length===0){ alert('অন্তত একটি কালার লাইন যোগ করুন'); return; }
@@ -402,26 +389,11 @@ function downloadColorPDF(){
 
   doc.autoTable({
     startY: subY,
-    head: [['','Color Name','Quantity','Unit']],
+    head: [['Color Name','Quantity','Unit']],
     body: rows,
     theme: 'grid',
     headStyles: { fillColor: [15,110,92] },
-    styles: { fontSize: 10, minCellHeight: 9 },
-    columnStyles: { 0: { cellWidth: 12 } },
-    didDrawCell: function(data){
-      if(data.section === 'body' && data.column.index === 0){
-        const hex = hexList[data.row.index] || '#ffffff';
-        const r = parseInt(hex.substr(1,2),16);
-        const g = parseInt(hex.substr(3,2),16);
-        const b = parseInt(hex.substr(5,2),16);
-        doc.setFillColor(r,g,b);
-        doc.setDrawColor(120,120,120);
-        const boxSize = 6;
-        const x = data.cell.x + (data.cell.width - boxSize)/2;
-        const y = data.cell.y + (data.cell.height - boxSize)/2;
-        doc.rect(x, y, boxSize, boxSize, 'FD');
-      }
-    }
+    styles: { fontSize: 10, minCellHeight: 9 }
   });
 
   let y = doc.lastAutoTable.finalY + 8;
@@ -429,8 +401,8 @@ function downloadColorPDF(){
 
   const totalsByUnit = {};
   rows.forEach(r=>{
-    const q = parseFloat(r[2]) || 0;
-    const u = r[3];
+    const q = parseFloat(r[1]) || 0;
+    const u = r[2];
     totalsByUnit[u] = (totalsByUnit[u] || 0) + q;
   });
   Object.keys(totalsByUnit).forEach(u=>{
