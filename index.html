@@ -395,44 +395,62 @@ function downloadColorPDF(){
   if(rows.length===0){ alert('অন্তত একটি কালার লাইন যোগ করুন'); return; }
 
   const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const marginX = 14;
 
-  // Embed a Bengali-capable font so Bengali text (color names, units) renders
-  // correctly instead of as broken characters.
-  if(window.NOTO_BENGALI_TTF_BASE64){
-    try{
+  // center shop name & details at top (red circle -> centered)
+  doc.setFontSize(18);
+  try{ // font embed if available
+    if(window.NOTO_BENGALI_TTF_BASE64){
       doc.addFileToVFS('NotoSansBengali-Regular.ttf', NOTO_BENGALI_TTF_BASE64);
       doc.addFont('NotoSansBengali-Regular.ttf', 'NotoBengali', 'normal');
       doc.setFont('NotoBengali');
-    }catch(e){ /* ignore if font already added */ }
-  }
+    }
+  }catch(e){/* ignore */}
 
-  const marginX = 14;
+  const topY = 18;
+  doc.text(shop, pageWidth/2, topY, {align:'center'});
+  let subY = topY + 8;
+  if(address){ doc.setFontSize(10); doc.text(address, pageWidth/2, subY, {align:'center'}); subY += 6; }
+  if(phone){ doc.setFontSize(10); doc.text('Phone: ' + phone, pageWidth/2, subY, {align:'center'}); subY += 6; }
 
-  doc.setFontSize(18);
-  doc.text(shop, marginX, 18);
+  // put Date at the empty top-right spot (yellow circle)
+  doc.setFontSize(10);
+  doc.text('Date: ' + date, pageWidth - marginX, topY, {align: 'right'});
 
-  let subY = 26;
-  if(address){
-    doc.setFontSize(10);
-    doc.text(address, marginX, subY);
-    subY += 6;
-  }
-  if(phone){
-    doc.setFontSize(10);
-    doc.text('Phone: ' + phone, marginX, subY);
-    subY += 6;
-  }
+  // Title under centered shop info
   doc.setFontSize(11);
-  doc.text('Color Order Request', marginX, subY);
+  doc.text('Color Order Request', pageWidth/2, subY, {align:'center'});
   subY += 8;
+
+  // Prepare table with a small 'swatch' column (we'll draw a small centered box)
+  const tableBody = rows.map(r => [r[0], r[1], '']);
 
   doc.autoTable({
     startY: subY,
-    head: [['Color Name','Quantity']],
-    body: rows,
+    head: [['Color Name','Quantity','']],
+    body: tableBody,
     theme: 'grid',
     headStyles: { fillColor: [15,110,92], font: 'NotoBengali' },
-    styles: { fontSize: 10, minCellHeight: 9, font: 'NotoBengali' }
+    styles: { fontSize: 10, minCellHeight: 12, font: 'NotoBengali' },
+    columnStyles: {
+      0: { cellWidth: 'auto', halign: 'left' },
+      1: { cellWidth: 30, halign: 'right' },
+      2: { cellWidth: 24, halign: 'center' }
+    },
+    didDrawCell: function (data) {
+      // draw a small centered box in the swatch column cells (col index 2)
+      if(data.column.index === 2 && data.section === 'body'){
+        const boxSize = 10; // small box as requested
+        const cx = data.cell.x + data.cell.width/2;
+        const cy = data.cell.y + data.cell.height/2;
+        const x = cx - boxSize/2;
+        const y = cy - boxSize/2;
+        // draw border rectangle (empty swatch)
+        doc.setDrawColor(100);
+        doc.rect(x, y, boxSize, boxSize);
+      }
+    }
   });
 
   let y = doc.lastAutoTable.finalY + 8;
@@ -446,7 +464,8 @@ function downloadColorPDF(){
 
   y += 8;
   doc.setFontSize(10);
-  doc.text('Date: ' + date, marginX, y);
+  // Also place a smaller date at bottom-left for compatibility (optional)
+  // doc.text('Date: ' + date, marginX, y);
 
   const fileName = 'color-order-' + date + '.pdf';
   savePdfSmart(doc, fileName);
