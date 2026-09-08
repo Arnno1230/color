@@ -128,7 +128,25 @@
     overflow-x:auto;
     border:1px solid var(--grid-line);
     border-radius:8px;
+    position:relative;
+    padding-top:36px; /* space for the small date above quantity */
   }
+  /* small date box that sits above the quantity column (aligned right) */
+  .sheet-date{
+    position:absolute;
+    top:8px;
+    right:68px; /* align approximately above quantity column (55px + gap) */
+    text-align:right;
+    width:120px;
+  }
+  .sheet-date input{
+    padding:6px 8px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    font-size:12px;
+    background:#fff;
+  }
+
   table.sheet{
     width:100%;
     border-collapse:collapse;
@@ -167,6 +185,16 @@
   table.sheet td.col-name input{text-align:left;}
   table.sheet td input:focus, table.sheet td select:focus{outline:none;background:#eaf7f2;}
   table.sheet tbody tr:nth-child(even) td:not(.sl){background:#fbfdfc;}
+
+  /* quantity input smaller and pushed to the right */
+  table.sheet td input[type=number]{
+    width:48px;
+    padding:6px 6px;
+    font-size:13px;
+    text-align:right;
+    margin-left:auto;
+    display:block;
+  }
 
   .del-cell{width:24px;background:#fff;}
   .del-btn{
@@ -214,7 +242,7 @@
     cursor:pointer;
     box-shadow:0 4px 12px rgba(251,133,0,0.4);
   }
-  .pdf-btn:active{transform:scale(0.98);}
+  .pdf-btn:active{transform:scale(0.98);} 
 
   .empty-note{
     font-size:12.5px;
@@ -222,6 +250,10 @@
     text-align:center;
     padding:8px 0;
   }
+
+  /* phone input centered under address */
+  .phone-center{display:flex;justify-content:center;margin-top:8px;}
+  .phone-center input{width:60%;text-align:center;}
 </style>
 </head>
 <body>
@@ -236,31 +268,31 @@
   <div class="card">
     <div class="header-field">
       <label>দোকান / ফ্যাক্টরির নাম</label>
-      <input type="text" id="colorShopName" placeholder="দোকান বা ফ্যাক্টরির নাম লিখুন">
+      <input type="text" id="colorShopName" placeholder="দোকান বা ফ্যাকটরির নাম লিখুন">
     </div>
 
     <div class="row-two">
       <div class="field grow">
         <label>ঠিকানা</label>
         <input type="text" id="colorAddress" placeholder="দোকানের ঠিকানা লিখুন">
+        <div class="phone-center">
+          <div style="width:100%;">
+            <label style="display:block;font-size:12px;color:var(--muted);margin:8px 0 5px;font-weight:600;text-align:center;">ফোন নম্বর (ঐচ্ছিক)</label>
+            <input type="text" id="colorPhone" placeholder="যোগাযোগের নম্বর">
+          </div>
+        </div>
       </div>
-      <div class="field small">
-        <label>তারিখ</label>
-        <input type="date" id="colorDate">
-      </div>
+      <!-- date removed from here; it's placed above the quantity column in the sheet -->
     </div>
 
-    <div class="row-two">
-      <div class="field grow">
-        <label>ফোন নম্বর (ঐচ্ছিক)</label>
-        <input type="text" id="colorPhone" placeholder="যোগাযোগের নম্বর">
-      </div>
-    </div>
   </div>
 
   <div class="card">
     <div class="section-title">📋 কালারের তালিকা</div>
     <div class="sheet-wrap">
+      <div class="sheet-date">
+        <input type="datetime-local" id="colorDateSmall">
+      </div>
       <table class="sheet">
         <thead>
           <tr>
@@ -290,7 +322,20 @@ function todayStr(){
   const d = new Date();
   return d.toISOString().split('T')[0];
 }
-document.getElementById('colorDate').value = todayStr();
+
+function pad(n){return n<10? '0'+n : n}
+function nowDatetimeLocal(){
+  const d = new Date();
+  const date = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  const time = pad(d.getHours())+':'+pad(d.getMinutes());
+  return date+'T'+time;
+}
+
+// set the small datetime input above the quantity
+window.addEventListener('DOMContentLoaded', ()=>{
+  const smallDateEl = document.getElementById('colorDateSmall');
+  if(smallDateEl){ smallDateEl.value = nowDatetimeLocal(); }
+});
 
 /* ---------- COLOR ROWS (swatch, name, quantity, unit) ---------- */
 let colorRowCount = 0;
@@ -336,7 +381,8 @@ function downloadColorPDF(){
   const shop = document.getElementById('colorShopName').value || '-';
   const address = document.getElementById('colorAddress').value || '';
   const phone = document.getElementById('colorPhone').value || '';
-  const date = document.getElementById('colorDate').value || todayStr();
+  const dateSmall = document.getElementById('colorDateSmall');
+  const date = (dateSmall && dateSmall.value) ? dateSmall.value.split('T')[0] : todayStr();
 
   const rowEls = document.querySelectorAll('#colorRows tr');
   const rows = [];
@@ -352,9 +398,13 @@ function downloadColorPDF(){
 
   // Embed a Bengali-capable font so Bengali text (color names, units) renders
   // correctly instead of as broken characters.
-  doc.addFileToVFS('NotoSansBengali-Regular.ttf', NOTO_BENGALI_TTF_BASE64);
-  doc.addFont('NotoSansBengali-Regular.ttf', 'NotoBengali', 'normal');
-  doc.setFont('NotoBengali');
+  if(window.NOTO_BENGALI_TTF_BASE64){
+    try{
+      doc.addFileToVFS('NotoSansBengali-Regular.ttf', NOTO_BENGALI_TTF_BASE64);
+      doc.addFont('NotoSansBengali-Regular.ttf', 'NotoBengali', 'normal');
+      doc.setFont('NotoBengali');
+    }catch(e){ /* ignore if font already added */ }
+  }
 
   const marginX = 14;
 
