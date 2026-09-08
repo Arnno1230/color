@@ -1,488 +1,486 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>কালার রিকুয়েস্ট</title>
-<script src="jspdf.umd.min.js"></script>
-<script src="jspdf.plugin.autotable.min.js"></script>
-<script src="notosansbengali-font.js"></script>
-<style>
-  :root{
-    --p1:#0f6e5c;
-    --p2:#12a37f;
-    --p3:#5fd6ae;
-    --accent:#ffb703;
-    --accent2:#fb8500;
-    --bg:#f2f7f5;
-    --card:#ffffff;
-    --text:#1c2a27;
-    --muted:#6c7b78;
-    --danger:#e5484d;
-    --border:#d6e0dc;
-    --grid-line:#c3d1cc;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Segoe UI', 'Noto Sans Bengali', sans-serif;
-    background:
-      radial-gradient(circle at 15% 0%, rgba(95,214,174,0.18), transparent 40%),
-      radial-gradient(circle at 90% 10%, rgba(255,183,3,0.15), transparent 35%),
-      var(--bg);
-    color:var(--text);
-    padding-bottom:44px;
-  }
-  header{
-    background:linear-gradient(120deg,var(--p1),var(--p2) 55%,var(--p3));
-    color:#fff;
-    padding:22px 16px 20px;
-    text-align:center;
-    border-radius:0 0 24px 24px;
-    box-shadow:0 6px 18px rgba(15,110,92,0.28);
-    position:relative;
-    overflow:hidden;
-  }
-  header::after{
-    content:"";
-    position:absolute;
-    top:-40px; right:-30px;
-    width:120px; height:120px;
-    background:rgba(255,255,255,0.12);
-    border-radius:50%;
-  }
-  header h1{margin:0;font-size:21px;font-weight:800;letter-spacing:0.3px;}
-  header p{margin:5px 0 0;font-size:12.5px;opacity:0.92;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>কালার রিকুয়েস্ট · বর্ধিত</title>
+  <script src="jspdf.umd.min.js"></script>
+  <script src="jspdf.plugin.autotable.min.js"></script>
+  <script src="notosansbengali-font.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  .container{
-    max-width:480px;
-    margin:16px auto 0;
-    padding:0 12px;
-  }
-  .card{
-    background:var(--card);
-    border-radius:16px;
-    padding:16px;
-    box-shadow:0 3px 12px rgba(15,50,40,0.08);
-    margin-bottom:16px;
-    border-top:5px solid var(--p2);
-  }
+    body {
+      font-family: 'Segoe UI', 'Noto Sans Bengali', system-ui, sans-serif;
+      background: #f0f6f4;
+      padding: 20px 12px 40px;
+      display: flex;
+      justify-content: center;
+    }
 
-  .header-field{margin-bottom:10px;}
-  .header-field label{
-    display:block;
-    font-size:11.5px;
-    color:var(--muted);
-    margin-bottom:5px;
-    font-weight:700;
-  }
-  .header-field input{
-    width:100%;
-    padding:14px 12px;
-    border:2px solid var(--p2);
-    border-radius:12px;
-    font-size:20px;
-    font-weight:800;
-    color:var(--p1);
-    background:#fbfcfc;
-    text-align:center;
-  }
-  .header-field input::placeholder{color:#a9b8b4;font-weight:600;}
-  .header-field input:focus{outline:none;box-shadow:0 0 0 3px rgba(18,163,127,0.18);}
+    .app {
+      max-width: 500px;
+      width: 100%;
+    }
 
-  .field label{
-    display:block;
-    font-size:12px;
-    color:var(--muted);
-    margin-bottom:5px;
-    font-weight:600;
-  }
-  .field input{
-    width:100%;
-    padding:9px 10px;
-    border:1px solid var(--border);
-    border-radius:9px;
-    font-size:14px;
-    background:#fbfcfc;
-  }
-  .field input:focus{outline:none;border-color:var(--p2);}
+    /* --- হেডার (সবুজ) --- */
+    .header-green {
+      background: linear-gradient(145deg, #0f6e5c, #12a37f);
+      color: white;
+      padding: 28px 18px 20px;
+      border-radius: 28px 28px 24px 24px;
+      box-shadow: 0 8px 20px rgba(15, 110, 92, 0.25);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
 
-  .row-two{display:flex;gap:10px;margin-top:10px;}
-  .row-two .field.grow{flex:2;}
-  .row-two .field.small{flex:1;}
+    .header-green h1 {
+      font-size: 28px;      /* বড় ফন্ট */
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin: 0 0 4px;
+    }
 
-  .section-title{
-    font-size:12.5px;
-    font-weight:800;
-    color:var(--p1);
-    margin:16px 0 8px;
-    padding-left:9px;
-    border-left:4px solid var(--accent);
-    display:flex;
-    align-items:center;
-    gap:6px;
-  }
+    .header-green .sub {
+      font-size: 14px;
+      opacity: 0.92;
+      font-weight: 500;
+    }
 
-  /* Spreadsheet / Excel-like grid */
-  .sheet-wrap{
-    overflow-x:auto;
-    border:1px solid var(--grid-line);
-    border-radius:8px;
-    position:relative;
-    padding-top:36px; /* space for the small date above quantity */
-  }
-  /* small date box that sits above the quantity column (aligned right) */
-  .sheet-date{
-    position:absolute;
-    top:8px;
-    right:68px; /* align approximately above quantity column (55px + gap) */
-    text-align:right;
-    width:120px;
-  }
-  .sheet-date input{
-    padding:6px 8px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    font-size:12px;
-    background:#fff;
-  }
+    .header-green::after {
+      content: "🎨";
+      position: absolute;
+      right: 16px;
+      bottom: 12px;
+      font-size: 44px;
+      opacity: 0.25;
+    }
 
-  table.sheet{
-    width:100%;
-    border-collapse:collapse;
-    background:#fff;
-  }
-  table.sheet th{
-    background:linear-gradient(120deg,#e8f6f1,#f5fbf8);
-    color:var(--p1);
-    font-size:11px;
-    font-weight:800;
-    padding:7px 4px;
-    text-align:center;
-    border:1px solid var(--grid-line);
-  }
-  table.sheet td{
-    border:1px solid var(--grid-line);
-    padding:0;
-    text-align:center;
-  }
-  table.sheet td.sl{
-    background:#f6f8f7;
-    color:var(--muted);
-    font-size:12px;
-    width:22px;
-    padding:6px 2px;
-  }
-  table.sheet td input, table.sheet td select{
-    width:100%;
-    border:none;
-    background:transparent;
-    padding:8px 5px;
-    font-size:13px;
-    text-align:center;
-    font-family:inherit;
-  }
-  table.sheet td.col-name input{text-align:left;}
-  table.sheet td input:focus, table.sheet td select:focus{outline:none;background:#eaf7f2;}
-  table.sheet tbody tr:nth-child(even) td:not(.sl){background:#fbfdfc;}
+    /* --- কার্ড --- */
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 18px 16px 20px;
+      box-shadow: 0 4px 16px rgba(0, 20, 16, 0.06);
+      margin-bottom: 20px;
+      border: 1px solid #e2eee9;
+    }
 
-  /* quantity input smaller and pushed to the right */
-  table.sheet td input[type=number]{
-    width:48px;
-    padding:6px 6px;
-    font-size:13px;
-    text-align:right;
-    margin-left:auto;
-    display:block;
-  }
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2b4a42;
+      margin-bottom: 4px;
+      display: block;
+    }
 
-  .del-cell{width:24px;background:#fff;}
-  .del-btn{
-    background:none;
-    border:none;
-    color:var(--danger);
-    font-size:15px;
-    cursor:pointer;
-    padding:4px;
-  }
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #d0ddd8;
+      border-radius: 14px;
+      font-size: 15px;
+      background: #fafdfc;
+      transition: 0.2s;
+      font-family: inherit;
+    }
 
-  .add-row-btn{
-    width:100%;
-    margin-top:10px;
-    padding:10px;
-    border:1.5px dashed var(--p2);
-    background:#f2fbf8;
-    color:var(--p1);
-    border-radius:10px;
-    font-size:13px;
-    font-weight:700;
-    cursor:pointer;
-  }
+    input:focus {
+      border-color: #12a37f;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(18, 163, 127, 0.12);
+    }
 
-  .totals{
-    margin-top:14px;
-    padding-top:12px;
-    border-top:1px dashed var(--border);
-    font-size:13px;
-    font-weight:700;
-  }
-  .totals-line{display:flex;justify-content:space-between;padding:3px 0;}
-  .totals-line span.value{color:var(--p1);}
+    .row-duo {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
 
-  .pdf-btn{
-    width:100%;
-    padding:15px;
-    margin-top:14px;
-    background:linear-gradient(120deg,var(--accent),var(--accent2));
-    color:#4a2a00;
-    border:none;
-    border-radius:14px;
-    font-size:15.5px;
-    font-weight:800;
-    cursor:pointer;
-    box-shadow:0 4px 12px rgba(251,133,0,0.4);
-  }
-  .pdf-btn:active{transform:scale(0.98);} 
+    .row-duo .grow { flex: 2; }
+    .row-duo .shrink { flex: 1; }
 
-  .empty-note{
-    font-size:12.5px;
-    color:var(--muted);
-    text-align:center;
-    padding:8px 0;
-  }
+    /* --- লাল বক্স (তারিখ) + নিচের লাল বক্স (total) --- */
+    .red-box-group {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+      margin-top: 12px;
+    }
 
-  /* phone input centered under address */
-  .phone-center{display:flex;justify-content:center;margin-top:8px;}
-  .phone-center input{width:60%;text-align:center;}
-</style>
+    .red-box {
+      background: #ffe6e6;
+      border: 1.5px solid #e5484d;
+      border-radius: 16px;
+      padding: 8px 12px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 52px;
+    }
+
+    .red-box .label {
+      font-weight: 700;
+      color: #a13033;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .red-box input {
+      background: transparent;
+      border: none;
+      padding: 4px 0;
+      font-weight: 600;
+      color: #4a1e1f;
+      font-size: 15px;
+      width: 100%;
+    }
+
+    .red-box input:focus {
+      box-shadow: none;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 8px;
+      padding-left: 6px;
+    }
+
+    /* মোট পরিমাণও লাল বক্সে দেখাবো */
+    .red-box .total-value {
+      font-weight: 800;
+      font-size: 18px;
+      color: #b13a3e;
+      padding: 0 2px;
+    }
+
+    /* --- স্প্রেডশীট --- */
+    .sheet-wrap {
+      border-radius: 16px;
+      border: 1px solid #cbdad4;
+      overflow-x: auto;
+      margin: 8px 0 12px;
+    }
+
+    table.sheet {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    table.sheet th {
+      background: #e6f3ef;
+      color: #0f5f4f;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 10px 4px;
+      border: 1px solid #bed3cb;
+      text-align: center;
+    }
+
+    table.sheet td {
+      border: 1px solid #bed3cb;
+      padding: 0;
+      vertical-align: middle;
+    }
+
+    table.sheet td.sl {
+      background: #f4f9f7;
+      color: #3b6b5e;
+      font-size: 13px;
+      font-weight: 600;
+      width: 28px;
+      padding: 6px 0;
+      text-align: center;
+    }
+
+    table.sheet td input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 10px 6px;
+      font-size: 14px;
+      text-align: center;
+      font-family: inherit;
+    }
+
+    table.sheet td.col-name input {
+      text-align: left;
+      padding-left: 10px;
+    }
+
+    table.sheet td input:focus {
+      background: #eaf7f2;
+      outline: none;
+    }
+
+    .del-btn {
+      background: none;
+      border: none;
+      color: #c0392b;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 8px;
+      width: 100%;
+      transition: 0.1s;
+    }
+
+    .del-btn:hover { background: #fee8e6; border-radius: 8px; }
+
+    .add-row-btn {
+      width: 100%;
+      padding: 12px;
+      border: 2px dashed #12a37f;
+      background: #f2fbf8;
+      color: #0f6e5c;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .add-row-btn:hover { background: #e3f6f0; }
+
+    /* PDF বাটন (হলুদ → বেগুনি সমান) */
+    /* আসল হলুদ বক্সটি বাদ, বেগুনি বক্স তৈরি */
+    .pdf-btn {
+      width: 100%;
+      padding: 16px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 40px;
+      background: #7c3aed;   /* বেগুনি */
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(124, 58, 237, 0.35);
+      transition: 0.15s;
+      letter-spacing: 0.3px;
+    }
+
+    .pdf-btn:active { transform: scale(0.97); }
+
+    /* খালি জায়গা */
+    .empty-note { color: #77928a; font-size: 13px; text-align: center; padding: 6px; }
+
+    /* কোন বেগুনি বক্স আলাদা নেই – তবে PDF বাটনই বেগুনি */
+    /* আর হলুদ বক্সটি সরানো হয়েছে */
+
+    /* স্পেস */
+    .mt-1 { margin-top: 8px; }
+  </style>
 </head>
 <body>
+  <div class="app">
 
-<header>
-  <h1>🎨 কালার রিকুয়েস্ট</h1>
-  <p>Developed by Hridoy</p>
-</header>
-
-<div class="container">
-
-  <div class="card">
-    <div class="header-field">
-      <label>দোকান / ফ্যাক্টরির নাম</label>
-      <input type="text" id="colorShopName" placeholder="দোকান বা ফ্যাকটরির নাম লিখুন">
+    <!-- হেডার: সবুজ, বড় ফন্ট -->
+    <div class="header-green">
+      <h1>🎨 কালার রিকুয়েস্ট</h1>
+      <div class="sub">Developed by Hridoy</div>
     </div>
 
-    <div class="row-two">
-      <div class="field grow">
-        <label>ঠিকানা</label>
-        <input type="text" id="colorAddress" placeholder="দোকানের ঠিকানা লিখুন">
-        <div class="phone-center">
-          <div style="width:100%;">
-            <label style="display:block;font-size:12px;color:var(--muted);margin:8px 0 5px;font-weight:600;text-align:center;">ফোন নম্বর (ঐচ্ছিক)</label>
-            <input type="text" id="colorPhone" placeholder="যোগাযোগের নম্বর">
-          </div>
+    <!-- কার্ড: দোকান, ঠিকানা, ফোন -->
+    <div class="card">
+      <div>
+        <label class="field-label">দোকান / ফ্যাক্টরির নাম</label>
+        <input type="text" id="colorShopName" placeholder="দোকান বা ফ্যাক্টরির নাম লিখুন">
+      </div>
+
+      <div class="row-duo">
+        <div class="grow">
+          <label class="field-label">ঠিকানা</label>
+          <input type="text" id="colorAddress" placeholder="ঠিকানা">
+        </div>
+        <div class="shrink">
+          <label class="field-label">ফোন</label>
+          <input type="text" id="colorPhone" placeholder="নম্বর">
         </div>
       </div>
-      <!-- date removed from here; it's placed above the quantity column in the sheet -->
-    </div>
 
-  </div>
-
-  <div class="card">
-    <div class="section-title">📋 কালারের তালিকা</div>
-    <div class="sheet-wrap">
-      <div class="sheet-date">
-        <input type="datetime-local" id="colorDateSmall">
+      <!-- লাল বক্স : তারিখ (উপরের লাল) + নিচের লাল বক্স (মোট পরিমাণ) একসাথে -->
+      <div class="red-box-group">
+        <!-- তারিখ বক্স (লাল) -->
+        <div class="red-box">
+          <span class="label">📅 তারিখ</span>
+          <input type="date" id="colorDate">
+        </div>
+        <!-- মোট পরিমাণ বক্স (লাল) – এখানে টোটাল দেখাবে -->
+        <div class="red-box" id="totalRedBox">
+          <span class="label">📦 মোট</span>
+          <span class="total-value" id="totalDisplay">০</span>
+        </div>
       </div>
-      <table class="sheet">
-        <thead>
-          <tr>
-            <th style="width:22px;">নং</th>
-            <th style="text-align:left;">কালারের নাম</th>
-            <th style="width:55px;">পরিমাণ</th>
-            <th style="width:22px;"></th>
-          </tr>
-        </thead>
-        <tbody id="colorRows"></tbody>
-      </table>
     </div>
-    <button class="add-row-btn" onclick="addColorRow()">+ নতুন লাইন যোগ করুন</button>
 
-    <div class="totals" id="totalsBox"></div>
+    <!-- কালারের তালিকা কার্ড -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-weight: 700; color: #0f6e5c; font-size: 16px;">📋 কালারের তালিকা</span>
+      </div>
 
-    <button class="pdf-btn" onclick="downloadColorPDF()">📄 পিডিএফ ডাউনলোড করুন</button>
+      <div class="sheet-wrap">
+        <table class="sheet">
+          <thead>
+            <tr>
+              <th style="width:28px;">নং</th>
+              <th style="text-align:left;">কালারের নাম</th>
+              <th style="width:70px;">পরিমাণ</th>
+              <th style="width:28px;"></th>
+            </tr>
+          </thead>
+          <tbody id="colorRows"></tbody>
+        </table>
+      </div>
+
+      <button class="add-row-btn" onclick="addColorRow()">+ নতুন লাইন যোগ করুন</button>
+
+      <!-- PDF বাটন : বেগুনি (হলুদ বক্স নেই, বেগুনি সমান) -->
+      <button class="pdf-btn" onclick="downloadColorPDF()">📄 পিডিএফ ডাউনলোড করুন</button>
+    </div>
+
   </div>
 
-</div>
+  <script>
+    const { jsPDF } = window.jspdf;
 
-<script>
-const { jsPDF } = window.jspdf;
+    /* ---------- date default ---------- */
+    function todayStr() {
+      const d = new Date();
+      return d.toISOString().split('T')[0];
+    }
+    document.getElementById('colorDate').value = todayStr();
 
-/* ---------- default date ---------- */
-function todayStr(){
-  const d = new Date();
-  return d.toISOString().split('T')[0];
-}
+    /* ---------- color rows ---------- */
+    let colorRowCount = 0;
 
-function pad(n){return n<10? '0'+n : n}
-function nowDatetimeLocal(){
-  const d = new Date();
-  const date = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-  const time = pad(d.getHours())+':'+pad(d.getMinutes());
-  return date+'T'+time;
-}
+    function addColorRow(name = '', qty = '') {
+      colorRowCount++;
+      const tbody = document.getElementById('colorRows');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="sl">${colorRowCount}</td>
+        <td class="col-name"><input type="text" placeholder="কালারের নাম" value="${name}"></td>
+        <td><input type="number" step="any" placeholder="০" value="${qty}" oninput="calcTotals()"></td>
+        <td><button class="del-btn" onclick="removeRow(this)">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+      calcTotals();
+    }
 
-// set the small datetime input above the quantity
-window.addEventListener('DOMContentLoaded', ()=>{
-  const smallDateEl = document.getElementById('colorDateSmall');
-  if(smallDateEl){ smallDateEl.value = nowDatetimeLocal(); }
-});
+    function removeRow(btn) {
+      const tr = btn.closest('tr');
+      tr.remove();
+      const rows = document.querySelectorAll('#colorRows tr');
+      rows.forEach((r, i) => { r.querySelector('.sl').innerText = i + 1; });
+      colorRowCount = rows.length;
+      calcTotals();
+    }
 
-/* ---------- COLOR ROWS (swatch, name, quantity, unit) ---------- */
-let colorRowCount = 0;
-function addColorRow(name='', hex='#12a37f'){
-  colorRowCount++;
-  const tbody = document.getElementById('colorRows');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td class="sl">${colorRowCount}</td>
-    <td class="col-name"><input type="text" placeholder="কালারের নাম" value="${name}"></td>
-    <td><input type="number" step="any" placeholder="0" oninput="calcTotals()"></td>
-    <td class="del-cell"><button class="del-btn" onclick="removeRow(this)">✕</button></td>
-  `;
-  tbody.appendChild(tr);
-  calcTotals();
-}
+    /* ---------- টোটাল ক্যালকুলেশন + লাল বক্স আপডেট ---------- */
+    function calcTotals() {
+      const rows = document.querySelectorAll('#colorRows tr');
+      let totalQty = 0;
+      rows.forEach(r => {
+        const inp = r.querySelector('input[type=number]');
+        if (inp) totalQty += parseFloat(inp.value) || 0;
+      });
 
-function removeRow(btn){
-  const tr = btn.closest('tr');
-  tr.remove();
-  const rows = document.querySelectorAll('#colorRows tr');
-  rows.forEach((r,i)=>{ r.querySelector('.sl').innerText = i+1; });
-  colorRowCount = rows.length;
-  calcTotals();
-}
+      const totalDisplay = document.getElementById('totalDisplay');
+      if (totalQty <= 0) {
+        totalDisplay.innerText = '০';
+      } else {
+        totalDisplay.innerText = totalQty;
+      }
+    }
 
-function calcTotals(){
-  const rows = document.querySelectorAll('#colorRows tr');
-  let totalQty = 0;
-  rows.forEach(r=>{
-    totalQty += parseFloat(r.querySelector('input[type=number]').value) || 0;
-  });
-  const box = document.getElementById('totalsBox');
-  if(totalQty <= 0){
-    box.innerHTML = '';
-    return;
-  }
-  box.innerHTML = `<div class="totals-line"><span>মোট পরিমাণ:</span><span class="value">${totalQty}</span></div>`;
-}
+    /* ---------- PDF (বাংলা ফন্ট সহ) ---------- */
+    function downloadColorPDF() {
+      const shop = document.getElementById('colorShopName').value || '-';
+      const address = document.getElementById('colorAddress').value || '';
+      const phone = document.getElementById('colorPhone').value || '';
+      const date = document.getElementById('colorDate').value || todayStr();
 
-/* ---------- PDF generation ---------- */
-function downloadColorPDF(){
-  const shop = document.getElementById('colorShopName').value || '-';
-  const address = document.getElementById('colorAddress').value || '';
-  const phone = document.getElementById('colorPhone').value || '';
-  const dateSmall = document.getElementById('colorDateSmall');
-  const date = (dateSmall && dateSmall.value) ? dateSmall.value.split('T')[0] : todayStr();
+      const rowEls = document.querySelectorAll('#colorRows tr');
+      const rows = [];
+      rowEls.forEach(r => {
+        const nameInput = r.querySelector('.col-name input');
+        const qtyInput = r.querySelector('input[type=number]');
+        rows.push([nameInput.value || '-', qtyInput.value || '0']);
+      });
 
-  const rowEls = document.querySelectorAll('#colorRows tr');
-  const rows = [];
-  rowEls.forEach((r,i)=>{
-    const nameInput = r.querySelector('.col-name input');
-    const qtyInput = r.querySelector('input[type=number]');
-    rows.push([nameInput.value || '-', qtyInput.value || '0']);
-  });
+      if (rows.length === 0) { alert('অন্তত একটি কালার লাইন যোগ করুন'); return; }
 
-  if(rows.length===0){ alert('অন্তত একটি কালার লাইন যোগ করুন'); return; }
+      const doc = new jsPDF();
 
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const marginX = 14;
-
-  // center shop name & details at top (red circle -> centered)
-  doc.setFontSize(18);
-  try{ // font embed if available
-    if(window.NOTO_BENGALI_TTF_BASE64){
+      // বাংলা ফন্ট এম্বেড
       doc.addFileToVFS('NotoSansBengali-Regular.ttf', NOTO_BENGALI_TTF_BASE64);
       doc.addFont('NotoSansBengali-Regular.ttf', 'NotoBengali', 'normal');
       doc.setFont('NotoBengali');
+
+      const marginX = 14;
+
+      doc.setFontSize(20);
+      doc.text(shop, marginX, 18);
+
+      let subY = 28;
+      if (address) {
+        doc.setFontSize(10);
+        doc.text(address, marginX, subY);
+        subY += 6;
+      }
+      if (phone) {
+        doc.setFontSize(10);
+        doc.text('Phone: ' + phone, marginX, subY);
+        subY += 6;
+      }
+      doc.setFontSize(12);
+      doc.text('Color Order Request', marginX, subY);
+      subY += 8;
+
+      doc.autoTable({
+        startY: subY,
+        head: [['Color Name', 'Quantity']],
+        body: rows,
+        theme: 'grid',
+        headStyles: { fillColor: [15, 110, 92], font: 'NotoBengali' },
+        styles: { fontSize: 10, minCellHeight: 9, font: 'NotoBengali' }
+      });
+
+      let y = doc.lastAutoTable.finalY + 8;
+      doc.setFontSize(11);
+
+      const totalQty = rows.reduce((sum, r) => sum + (parseFloat(r[1]) || 0), 0);
+      if (totalQty > 0) {
+        doc.text(`Total Quantity: ${totalQty}`, marginX, y);
+        y += 6;
+      }
+
+      y += 6;
+      doc.setFontSize(10);
+      doc.text('Date: ' + date, marginX, y);
+
+      const fileName = 'color-order-' + date + '.pdf';
+      savePdfSmart(doc, fileName);
     }
-  }catch(e){/* ignore */}
 
-  const topY = 18;
-  doc.text(shop, pageWidth/2, topY, {align:'center'});
-  let subY = topY + 8;
-  if(address){ doc.setFontSize(10); doc.text(address, pageWidth/2, subY, {align:'center'}); subY += 6; }
-  if(phone){ doc.setFontSize(10); doc.text('Phone: ' + phone, pageWidth/2, subY, {align:'center'}); subY += 6; }
-
-  // put Date at the empty top-right spot (yellow circle)
-  doc.setFontSize(10);
-  doc.text('Date: ' + date, pageWidth - marginX, topY, {align: 'right'});
-
-  // Title under centered shop info
-  doc.setFontSize(11);
-  doc.text('Color Order Request', pageWidth/2, subY, {align:'center'});
-  subY += 8;
-
-  // Prepare table with a small 'swatch' column (we'll draw a small centered box)
-  const tableBody = rows.map(r => [r[0], r[1], '']);
-
-  doc.autoTable({
-    startY: subY,
-    head: [['Color Name','Quantity','']],
-    body: tableBody,
-    theme: 'grid',
-    headStyles: { fillColor: [15,110,92], font: 'NotoBengali' },
-    styles: { fontSize: 10, minCellHeight: 12, font: 'NotoBengali' },
-    columnStyles: {
-      0: { cellWidth: 'auto', halign: 'left' },
-      1: { cellWidth: 30, halign: 'right' },
-      2: { cellWidth: 24, halign: 'center' }
-    },
-    didDrawCell: function (data) {
-      // draw a small centered box in the swatch column cells (col index 2)
-      if(data.column.index === 2 && data.section === 'body'){
-        const boxSize = 10; // small box as requested
-        const cx = data.cell.x + data.cell.width/2;
-        const cy = data.cell.y + data.cell.height/2;
-        const x = cx - boxSize/2;
-        const y = cy - boxSize/2;
-        // draw border rectangle (empty swatch)
-        doc.setDrawColor(100);
-        doc.rect(x, y, boxSize, boxSize);
+    function savePdfSmart(doc, fileName) {
+      if (window.AndroidPDF && typeof window.AndroidPDF.savePdf === 'function') {
+        const base64 = doc.output('datauristring').split(',')[1];
+        window.AndroidPDF.savePdf(base64, fileName);
+      } else {
+        doc.save(fileName);
       }
     }
-  });
 
-  let y = doc.lastAutoTable.finalY + 8;
-  doc.setFontSize(11);
-
-  const totalQty = rows.reduce((sum, r) => sum + (parseFloat(r[1]) || 0), 0);
-  if(totalQty > 0){
-    doc.text(`Total Quantity: ${totalQty}`, marginX, y);
-    y += 6;
-  }
-
-  y += 8;
-  doc.setFontSize(10);
-  // Also place a smaller date at bottom-left for compatibility (optional)
-  // doc.text('Date: ' + date, marginX, y);
-
-  const fileName = 'color-order-' + date + '.pdf';
-  savePdfSmart(doc, fileName);
-}
-
-function savePdfSmart(doc, fileName){
-  if(window.AndroidPDF && typeof window.AndroidPDF.savePdf === 'function'){
-    const base64 = doc.output('datauristring').split(',')[1];
-    window.AndroidPDF.savePdf(base64, fileName);
-  } else {
-    doc.save(fileName);
-  }
-}
-
-/* ---------- init ---------- */
-for(let i=0;i<4;i++) addColorRow();
-</script>
+    /* ---------- init : ৪টি সারি ---------- */
+    for (let i = 0; i < 4; i++) addColorRow();
+  </script>
 
 </body>
 </html>
